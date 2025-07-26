@@ -1,17 +1,20 @@
 /// <reference types="cypress" />
 
-/**
- * End‑to‑end tests for the todo application. This test covers the
- * registration of a new user, login, creation of a todo, updating
- * and deleting that todo, and finally logging out. A unique email is
- * generated for each run to ensure idempotency.
- */
+
 describe('Todo App Flow', () => {
-  it('allows a user to register, login, manage todos and logout', () => {
+  it('handles invalid login then allows a user to register, login, manage todos and logout', () => {
     const email = `user_${Date.now()}@example.com`;
     const password = 'Password123!';
 
-    // Visit registration page
+    // Attempt to login with invalid credentials and expect an error
+    cy.visit('/login');
+    cy.get('[data-testid="email-input"]').type('invalid@example.com');
+    cy.get('[data-testid="password-input"]').type('WrongPassword');
+    cy.get('[data-testid="login-submit"]').click();
+    // An error message should appear
+    cy.get('[data-testid="login-error"]').should('contain', 'Invalid');
+
+    // Navigate to registration page to create a valid account
     cy.visit('/register');
     // Fill registration form and submit
     cy.get('[data-testid="register-email-input"]').type(email);
